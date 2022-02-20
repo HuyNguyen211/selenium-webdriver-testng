@@ -1,10 +1,12 @@
 package webdriver;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.Color;
 import org.testng.Assert;
@@ -23,7 +25,7 @@ public class Topic_09_Button_defaultRadio_Checkbox {
 		driver = new FirefoxDriver();
 		jsExecutor = (JavascriptExecutor) driver;
 		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-		
+		driver.manage().window().maximize();
 	}
 		
 	//@Test
@@ -66,19 +68,145 @@ public class Topic_09_Button_defaultRadio_Checkbox {
 		
 		driver.findElement(loginButtonBy).click();
 		
-		Assert.assertEquals(driver.findElement(By.xpath("//div[@class='popup-login-content']//label[text()='Số điện thoại/Email']/following-sibling::div[@class='fhs-input-alert']")).getText(), "Thông tin này không thể để trống");
+		Assert.assertEquals(driver.findElement(By.xpath("//div[@class='popup-login-content']//label[text()='Số điện thoại/Email']/following-sibling::div[@class='fhs-input-alert']")).getText(), 
+				"Thông tin này không thể để trống");
 		
-		Assert.assertEquals(driver.findElement(By.xpath("//div[@class='popup-login-content']//label[text()='Mật khẩu']/following-sibling::div[@class='fhs-input-alert']")).getText(), "Thông tin này không thể để trống");
+		Assert.assertEquals(driver.findElement(By.xpath("//div[@class='popup-login-content']//label[text()='Mật khẩu']/following-sibling::div[@class='fhs-input-alert']")).getText(), 
+				"Thông tin này không thể để trống");
 	}
 	
-	@Test
+	//Test
 	public void TC_02_Default_Radio() {
+		driver.get("https://demos.telerik.com/kendo-ui/radiobutton/index");
+		
+		//Default - the input:
+		//Action: click
+		//Verify
+		
+		//Custom - the input:
+		//Action: ko click dc
+		//Verify dc
+		
+		By petrolRadio = By.xpath("//label[text()='1.8 Petrol, 118kW']/preceding-sibling::input");
+		By dieselRadio = By.xpath("//label[text()='1.6 Diesel, 77kW']/preceding-sibling::input");
+		By twodieselRadio = By.xpath("//label[text()='2.0 Diesel, 125kW']/preceding-sibling::input");
+		
+		Assert.assertFalse(driver.findElement(petrolRadio).isSelected());
+		
+		driver.findElement(petrolRadio).click();
+		sleepInSecond(2);
+		
+		Assert.assertTrue(driver.findElement(petrolRadio).isSelected());
+		
+		driver.findElement(dieselRadio).click();
+		sleepInSecond(2);
+		
+		//Deselected
+		Assert.assertFalse(driver.findElement(petrolRadio).isSelected());
+		
+		//Selected
+		Assert.assertTrue(driver.findElement(dieselRadio).isSelected());
+		
+		//Disabled
+		Assert.assertFalse(driver.findElement(twodieselRadio).isEnabled());
+		
+		//Enabled
+		Assert.assertTrue(driver.findElement(petrolRadio).isEnabled());
+		Assert.assertTrue(driver.findElement(dieselRadio).isEnabled());
+	}
+	
+	//Test
+	public void TC_03_Checkbox() {
+		driver.get("http://demos.telerik.com/kendo-ui/styling/checkboxes");
+				
+		By leatherCheckbox = By.xpath("//label[text()='Leather trim']/preceding-sibling::input");
+		By luggageCheckbox = By.xpath("//label[text()='Luggage compartment cover']/preceding-sibling::input");
+		By towbarCheckbox = By.xpath("//label[text()='Towbar preparation']/preceding-sibling::input");
+		
+		//if(driver.findElement(luggageCheckbox).isSelected()) = nếu "nó đã dc chọn"
+		//if(!driver.findElement(luggageCheckbox).isSelected()) = nếu "nó chưa dc chọn"
+		
+		//Selected
+		checkToCheckbox(luggageCheckbox);
+		
+		//verify
+		Assert.assertTrue(isElementSelected(luggageCheckbox));
+		Assert.assertTrue(isElementSelected(leatherCheckbox));
+		
+		//Disable
+		Assert.assertFalse(isElementEnabled(leatherCheckbox));
+		Assert.assertFalse(isElementEnabled(towbarCheckbox));
+		
+		//De-selected
+		uncheckToCheckbox(luggageCheckbox);
+		
+		//verify
+		Assert.assertFalse(isElementSelected(luggageCheckbox));
+		Assert.assertFalse(isElementSelected(towbarCheckbox));
+		
 		
 	}
 	
 	@Test
-	public void TC_03_Checkbox() {
+	public void TC_04_Multiple_Checkbox() {
+		driver.get("https://automationfc.github.io/multiple-fields/");
 		
+		List<WebElement> checkboxes = driver.findElements(By.cssSelector("input[type='checkbox']"));
+		System.out.println("Checkbox total = " +checkboxes.size());
+		
+		//Action - select
+		for (WebElement checkbox : checkboxes) {
+			if (!checkbox.isSelected()) {
+				checkbox.click();
+			}
+		}
+		
+		//verify - selected
+		for (WebElement checkbox : checkboxes) {
+			Assert.assertTrue(checkbox.isSelected());
+			
+		}
+		
+		//Action - deselect
+		for (WebElement checkbox : checkboxes) {
+			if (checkbox.isSelected()) {
+				checkbox.click();
+			}
+		}
+		
+		//verify - deselected
+		for (WebElement checkbox : checkboxes) {
+			Assert.assertFalse(checkbox.isSelected());
+			
+		}
+	}
+	
+	public void checkToCheckbox(By by) {
+		if(!driver.findElement(by).isSelected()) {
+			driver.findElement(by).click();
+		}
+	}
+	
+	public void uncheckToCheckbox(By by) {
+		if(driver.findElement(by).isSelected()) {
+			driver.findElement(by).click();
+		}
+	}
+	
+	public boolean isElementSelected(By by) {
+		if (driver.findElement(by).isSelected()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean isElementEnabled(By by) {
+		if (driver.findElement(by).isEnabled()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@AfterClass
