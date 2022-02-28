@@ -153,6 +153,8 @@ public class Topic_08_Custom_Dropdown {
 				
 				//Step 4: Click vào item đó
 				item.click();
+				sleepInSecond(2);
+				//có thể thay bằng click của Javascript
 				
 				break;
 			}
